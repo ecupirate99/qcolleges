@@ -23,6 +23,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 label {
@@ -51,11 +52,29 @@ button:hover {
 #results {
   margin-top: 20px;
 }
+
 .college {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
 }
+
 .college h3 {
   margin: 0;
   color: #0077cc;
+}
+
+/* Spinner styling */
+.spinner {
+  margin: 20px auto;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #0077cc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
