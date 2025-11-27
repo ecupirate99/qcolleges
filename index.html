@@ -8,6 +8,17 @@
 <body>
   <div class="container">
     <h1>College Finder</h1>
+
+    <!-- Conversational free-text field -->
+    <form id="questionForm">
+      <label for="question">Ask a Question:</label>
+      <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20000">
+      <button type="submit">Ask</button>
+    </form>
+
+    <hr>
+
+    <!-- Structured filters -->
     <form id="filterForm">
       <label for="state">State:</label>
       <input type="text" id="state" name="state" placeholder="e.g. NC">
