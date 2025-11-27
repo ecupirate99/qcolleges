@@ -13,6 +13,14 @@
     <form id="questionForm">
       <label for="question">Ask a Question:</label>
       <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20000">
+
+      <!-- Tuition filter radio buttons -->
+      <div class="radio-group">
+        <label><input type="radio" name="tuition_filter" value="in_state" checked> In-state only</label>
+        <label><input type="radio" name="tuition_filter" value="out_state"> Out-of-state only</label>
+        <label><input type="radio" name="tuition_filter" value="both"> Both in-state & out-of-state</label>
+      </div>
+
       <button type="submit">Ask</button>
     </form>
 
@@ -25,13 +33,6 @@
 
       <label for="max_tuition">Max Tuition:</label>
       <input type="number" id="max_tuition" name="max_tuition" placeholder="20000">
-
-      <label for="tuition_filter">Tuition Filter:</label>
-      <select id="tuition_filter" name="tuition_filter">
-        <option value="both">Both in-state & out-of-state</option>
-        <option value="in_state">In-state only</option>
-        <option value="out_state">Out-of-state only</option>
-      </select>
 
       <label for="name">College Name (optional):</label>
       <input type="text" id="name" name="name" placeholder="UNC">
