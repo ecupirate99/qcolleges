@@ -39,7 +39,7 @@ async function fetchResults(filters) {
   }
 }
 
-// Render results
+// Render results as cards with expandable tabs
 function renderResults(data) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "";
@@ -50,45 +50,46 @@ function renderResults(data) {
   }
 
   data.forEach(college => {
-    const div = document.createElement("div");
-    div.className = "college";
-    div.innerHTML = `
+    const card = document.createElement("div");
+    card.className = "college-card";
+    card.innerHTML = `
       <h3>${college["school.name"]}</h3>
       <p>${college["school.city"]}, ${college["school.state"]}</p>
-      <p>In-State Tuition: $${college["latest.cost.tuition.in_state"]}</p>
-      <p>Out-of-State Tuition: $${college["latest.cost.tuition.out_of_state"]}</p>
-      <p>Acceptance Rate: ${
-        college["latest.admissions.admission_rate"] 
-          ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%" 
+      <p>💰 In-State Tuition: $${college["latest.cost.tuition.in_state"]}</p>
+      <p>💰 Out-of-State Tuition: $${college["latest.cost.tuition.out_of_state"]}</p>
+      <p>🎓 Graduation Rate: ${
+        college["latest.completion.rate_suppressed.overall"] 
+          ? (college["latest.completion.rate_suppressed.overall"] * 100).toFixed(1) + "%" 
           : "N/A"
       }</p>
-      <p>Student Size: ${college["latest.student.size"]}</p>
-      <a href="${college["school.school_url"]}" target="_blank">Visit Website</a>
-    `;
-    resultsDiv.appendChild(div);
-  });
-}
-
-// Handle free-text question form
-document.getElementById("questionForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const question = document.getElementById("question").value;
-  const filters = parseQuestion(question);
-  fetchResults(filters);
-});
-
-// Handle structured filter form
-document.getElementById("filterForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const filters = {};
-  const state = document.getElementById("state").value;
-  const maxTuition = document.getElementById("max_tuition").value;
-  const name = document.getElementById("name").value;
-
-  if (state) filters.state = state;
-  if (maxTuition) filters.max_tuition = maxTuition;
-  if (name) filters.name = name;
-
-  fetchResults(filters);
-});
+      <button class="expand-btn">More Details</button>
+      <div class="details">
+        <div class="tabs">
+          <div class="tab active" data-tab="overview">Overview</div>
+          <div class="tab" data-tab="costs">Costs & Aid</div>
+          <div class="tab" data-tab="outcomes">Outcomes</div>
+        </div>
+        <div class="tab-content active" id="overview">
+          <p>Acceptance Rate: ${
+            college["latest.admissions.admission_rate"] 
+              ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%" 
+              : "N/A"
+          }</p>
+          <p>Student Size: ${college["latest.student.size"]}</p>
+        </div>
+        <div class="tab-content" id="costs">
+          <p>Average Debt: ${
+            college["latest.aid.median_debt.completers"] 
+              ? "$" + college["latest.aid.median_debt.completers"] 
+              : "N/A"
+          }</p>
+          <p>Pell Grant %: ${
+            college["latest.aid.pell_grant_rate"] 
+              ? (college["latest.aid.pell_grant_rate"] * 100).toFixed(1) + "%" 
+              : "N/A"
+          }</p>
+        </div>
+        <div class="tab-content" id="outcomes">
+          <p>Median Earnings (10 yrs): ${
+            college["latest.earnings.10_yrs_after_entry.median"] 
+              ? "$"
