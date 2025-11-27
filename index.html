@@ -12,13 +12,13 @@
     <!-- Conversational free-text field -->
     <form id="questionForm">
       <label for="question">Ask a question:</label>
-      <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20k with graduation rate above 70%">
+      <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20000">
 
-      <!-- Tuition filter radio buttons (required selection) -->
+      <!-- Tuition filter radio buttons -->
       <div class="radio-group">
         <label><input type="radio" name="q_tuition_filter" value="in_state" checked> In-state only</label>
         <label><input type="radio" name="q_tuition_filter" value="out_state"> Out-of-state only</label>
-        <label><input type="radio" name="q_tuition_filter" value="both"> Both in-state & out-of-state</label>
+        <label><input type="radio" name="q_tuition_filter" value="both"> Both</label>
       </div>
 
       <button type="submit">Ask</button>
@@ -31,17 +31,17 @@
       <label for="state">State:</label>
       <input type="text" id="state" name="state" placeholder="e.g. NC">
 
-      <label for="max_tuition">Max tuition:</label>
+      <label for="max_tuition">Max Tuition:</label>
       <input type="number" id="max_tuition" name="max_tuition" placeholder="20000">
 
       <!-- Tuition filter radio buttons for structured form -->
       <div class="radio-group">
         <label><input type="radio" name="f_tuition_filter" value="in_state" checked> In-state only</label>
         <label><input type="radio" name="f_tuition_filter" value="out_state"> Out-of-state only</label>
-        <label><input type="radio" name="f_tuition_filter" value="both"> Both in-state & out-of-state</label>
+        <label><input type="radio" name="f_tuition_filter" value="both"> Both</label>
       </div>
 
-      <label for="name">College name (optional):</label>
+      <label for="name">College Name (optional):</label>
       <input type="text" id="name" name="name" placeholder="UNC">
 
       <button type="submit">Search</button>
