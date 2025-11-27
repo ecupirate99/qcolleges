@@ -68,7 +68,7 @@ function renderResults(data) {
       <h3>${college["school.name"]}</h3>
       <p>${college["school.city"]}, ${college["school.state"]}</p>
       <p>💰 In-State Tuition: $${college["latest.cost.tuition.in_state"] ?? "N/A"}</p>
-      <p>💰 Out-of-State Tuition: $${college["latest.cost.tuition.out_of_state"] ?? "N/A"}</p>
+      <p>💰 Out-of-State Tuition: $${college["latest.cost.tuition.out_state"] ?? "N/A"}</p>
       <p>🎓 Graduation Rate: ${
         college["latest.completion.rate_suppressed.overall"] != null
           ? (college["latest.completion.rate_suppressed.overall"] * 100).toFixed(1) + "%"
@@ -119,9 +119,11 @@ document.getElementById("questionForm").addEventListener("submit", (e) => {
 
   const filters = parseQuestion(question);
 
-  // Read selected radio for question form
+  // ✅ Read selected radio for question form
   const qSelected = document.querySelector('input[name="q_tuition_filter"]:checked');
-  if (qSelected) filters.tuition_filter = qSelected.value;
+  if (qSelected) {
+    filters.tuition_filter = qSelected.value;
+  }
 
   // Normalize state to uppercase
   if (filters.state) filters.state = filters.state.toUpperCase();
@@ -142,9 +144,11 @@ document.getElementById("filterForm").addEventListener("submit", (e) => {
   if (maxTuition) filters.max_tuition = maxTuition;
   if (name) filters.name = name;
 
-  // Read selected radio for structured form
+  // ✅ Read selected radio for structured form
   const fSelected = document.querySelector('input[name="f_tuition_filter"]:checked');
-  if (fSelected) filters.tuition_filter = fSelected.value;
+  if (fSelected) {
+    filters.tuition_filter = fSelected.value;
+  }
 
   fetchResults(filters);
 });
