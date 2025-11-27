@@ -17,37 +17,27 @@ function parseQuestion(text) {
   return filters;
 }
 
-// Handle free-text question form
-document.getElementById("questionForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const question = document.getElementById("question").value;
-  const filters = parseQuestion(question);
-
+// Shared function to fetch and render results
+async function fetchResults(filters) {
   const query = new URLSearchParams(filters);
-  const res = await fetch(`/.netlify/functions/colleges?${query}`);
-  const data = await res.json();
 
-  renderResults(data);
-});
+  // Show spinner
+  const loadingDiv = document.getElementById("loading");
+  const resultsDiv = document.getElementById("results");
+  loadingDiv.style.display = "block";
+  resultsDiv.innerHTML = "";
 
-// Handle structured filter form
-document.getElementById("filterForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const state = document.getElementById("state").value;
-  const maxTuition = document.getElementById("max_tuition").value;
-  const name = document.getElementById("name").value;
-
-  const query = new URLSearchParams();
-  if (state) query.append("state", state);
-  if (maxTuition) query.append("max_tuition", maxTuition);
-  if (name) query.append("name", name);
-
-  const res = await fetch(`/.netlify/functions/colleges?${query}`);
-  const data = await res.json();
-
-  renderResults(data);
-});
+  try {
+    const res = await fetch(`/.netlify/functions/colleges?${query}`);
+    const data = await res.json();
+    renderResults(data);
+  } catch (err) {
+    resultsDiv.innerHTML = "<p>Error fetching results.</p>";
+  } finally {
+    // Hide spinner
+    loadingDiv.style.display = "none";
+  }
+}
 
 // Render results
 function renderResults(data) {
@@ -74,3 +64,27 @@ function renderResults(data) {
     resultsDiv.appendChild(div);
   });
 }
+
+// Handle free-text question form
+document.getElementById("questionForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const question = document.getElementById("question").value;
+  const filters = parseQuestion(question);
+  fetchResults(filters);
+});
+
+// Handle structured filter form
+document.getElementById("filterForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const filters = {};
+  const state = document.getElementById("state").value;
+  const maxTuition = document.getElementById("max_tuition").value;
+  const name = document.getElementById("name").value;
+
+  if (state) filters.state = state;
+  if (maxTuition) filters.max_tuition = maxTuition;
+  if (name) filters.name = name;
+
+  fetchResults(filters);
+});
