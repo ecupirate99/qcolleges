@@ -50,7 +50,7 @@ button:hover {
 }
 
 .radio-group {
-  margin: 10px 0;
+  margin: 6px 0 2px 0;
   display: flex;
   gap: 15px;
 }
