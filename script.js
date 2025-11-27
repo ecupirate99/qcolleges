@@ -57,7 +57,11 @@ function renderResults(data) {
       <p>${college["school.city"]}, ${college["school.state"]}</p>
       <p>In-State Tuition: $${college["latest.cost.tuition.in_state"]}</p>
       <p>Out-of-State Tuition: $${college["latest.cost.tuition.out_of_state"]}</p>
-      <p>Acceptance Rate: ${(college["latest.admissions.admission_rate"] * 100).toFixed(1)}%</p>
+      <p>Acceptance Rate: ${
+        college["latest.admissions.admission_rate"] 
+          ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%" 
+          : "N/A"
+      }</p>
       <p>Student Size: ${college["latest.student.size"]}</p>
       <a href="${college["school.school_url"]}" target="_blank">Visit Website</a>
     `;
