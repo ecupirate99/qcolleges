@@ -13,8 +13,15 @@ exports.handler = async (event) => {
   });
 
   const query = event.queryStringParameters;
+
   if (query.state) params.append("school.state", query.state);
-  if (query.max_tuition) params.append("latest.cost.tuition.in_state__lt", query.max_tuition);
+
+  // Apply tuition filter to both in-state and out-of-state
+  if (query.max_tuition) {
+    params.append("latest.cost.tuition.in_state__lt", query.max_tuition);
+    params.append("latest.cost.tuition.out_of_state__lt", query.max_tuition);
+  }
+
   if (query.name) params.append("school.name", query.name);
 
   const response = await fetch(`${BASE_URL}?${params}`);
