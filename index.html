@@ -12,7 +12,7 @@
     <!-- Conversational free-text field -->
     <form id="questionForm">
       <label for="question">Ask a Question:</label>
-      <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20k with graduation rate above 70%">
+      <input type="text" id="question" name="question" placeholder="e.g. Find colleges in NC under $20000">
       <button type="submit">Ask</button>
     </form>
 
@@ -23,10 +23,17 @@
       <label for="state">State:</label>
       <input type="text" id="state" name="state" placeholder="e.g. NC">
 
-      <label for="max_tuition">Max tuition (both in/out-of-state):</label>
+      <label for="max_tuition">Max Tuition:</label>
       <input type="number" id="max_tuition" name="max_tuition" placeholder="20000">
 
-      <label for="name">College name (optional):</label>
+      <label for="tuition_filter">Tuition Filter:</label>
+      <select id="tuition_filter" name="tuition_filter">
+        <option value="both">Both in-state & out-of-state</option>
+        <option value="in_state">In-state only</option>
+        <option value="out_state">Out-of-state only</option>
+      </select>
+
+      <label for="name">College Name (optional):</label>
       <input type="text" id="name" name="name" placeholder="UNC">
 
       <button type="submit">Search</button>
