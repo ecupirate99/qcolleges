@@ -1,3 +1,36 @@
+// Helper: parse free-text into filters
+function parseQuestion(text) {
+  const filters = {};
+
+  // Match state abbreviations (simple regex for 2 letters)
+  const stateMatch = text.match(/\b[A-Z]{2}\b/);
+  if (stateMatch) filters.state = stateMatch[0];
+
+  // Match tuition amounts like $20000 or 20000
+  const tuitionMatch = text.match(/\$?(\d{4,6})/);
+  if (tuitionMatch) filters.max_tuition = tuitionMatch[1];
+
+  // Match college name keywords (basic heuristic: words after "college" or "university")
+  const nameMatch = text.match(/(?:college|university)\s+([A-Za-z]+)/i);
+  if (nameMatch) filters.name = nameMatch[1];
+
+  return filters;
+}
+
+// Handle free-text question form
+document.getElementById("questionForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const question = document.getElementById("question").value;
+  const filters = parseQuestion(question);
+
+  const query = new URLSearchParams(filters);
+  const res = await fetch(`/.netlify/functions/colleges?${query}`);
+  const data = await res.json();
+
+  renderResults(data);
+});
+
+// Handle structured filter form
 document.getElementById("filterForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -13,6 +46,11 @@ document.getElementById("filterForm").addEventListener("submit", async (e) => {
   const res = await fetch(`/.netlify/functions/colleges?${query}`);
   const data = await res.json();
 
+  renderResults(data);
+});
+
+// Render results
+function renderResults(data) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "";
 
@@ -35,4 +73,4 @@ document.getElementById("filterForm").addEventListener("submit", async (e) => {
     `;
     resultsDiv.appendChild(div);
   });
-});
+}
