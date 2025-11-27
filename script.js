@@ -28,6 +28,8 @@ function parseQuestion(text) {
 
 async function fetchResults(filters) {
   const query = new URLSearchParams(filters);
+  console.log("Query:", query.toString()); // Debug
+
   const loadingDiv = document.getElementById("loading");
   const resultsDiv = document.getElementById("results");
 
@@ -37,9 +39,11 @@ async function fetchResults(filters) {
   try {
     const res = await fetch(`/.netlify/functions/colleges?${query}`);
     const data = await res.json();
+    console.log("Results:", data); // Debug
     renderResults(data);
-  } catch {
+  } catch (err) {
     resultsDiv.innerHTML = "<p>Error fetching results.</p>";
+    console.error(err);
   } finally {
     loadingDiv.style.display = "none";
   }
@@ -67,52 +71,4 @@ function renderResults(data) {
           ? (college["latest.completion.rate_suppressed.overall"] * 100).toFixed(1) + "%"
           : "N/A"
       }</p>
-      <button class="expand-btn" type="button">More Details ▼</button>
-      <div class="details">
-        <div class="tabs">
-          <div class="tab active" data-tab="overview">Overview</div>
-          <div class="tab" data-tab="costs">Costs & Aid</div>
-          <div class="tab" data-tab="outcomes">Outcomes</div>
-        </div>
-        <div class="tab-content active" data-content="overview">
-          <p>Acceptance Rate: ${
-            college["latest.admissions.admission_rate"] != null
-              ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%"
-              : "N/A"
-          }</p>
-          <p>Student Size: ${college["latest.student.size"] ?? "N/A"}</p>
-          <p><a href="${college["school.school_url"]}" target="_blank">Visit Website</a></p>
-        </div>
-        <div class="tab-content" data-content="costs">
-          <p>Average Debt: ${
-            college["latest.aid.median_debt.completers"] != null
-              ? "$" + college["latest.aid.median_debt.completers"]
-              : "N/A"
-          }</p>
-          <p>Pell Grant %: ${
-            college["latest.aid.pell_grant_rate"] != null
-              ? (college["latest.aid.pell_grant_rate"] * 100).toFixed(1) + "%"
-              : "N/A"
-          }</p>
-        </div>
-        <div class="tab-content" data-content="outcomes">
-          <p>Median Earnings (10 yrs): ${
-            college["latest.earnings.10_yrs_after_entry.median"] != null
-              ? "$" + college["latest.earnings.10_yrs_after_entry.median"]
-              : "N/A"
-          }</p>
-        </div>
-      </div>
-    `;
-
-    // Expand/collapse details
-    const expandBtn = card.querySelector(".expand-btn");
-    const detailsDiv = card.querySelector(".details");
-    expandBtn.addEventListener("click", () => {
-      const hidden = detailsDiv.style.display === "" || detailsDiv.style.display === "none";
-      detailsDiv.style.display = hidden ? "block" : "none";
-    });
-
-    // Tabs wiring
-    const tabs = card.querySelectorAll(".tab");
-    const contents = card.querySelector
+      <button class="expand-btn" type="button">More Details ▼
