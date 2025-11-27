@@ -1,10 +1,9 @@
 const fetch = require("node-fetch");
 
 exports.handler = async (event) => {
-  const API_KEY = process.env.COLLEGE_SCORECARD_KEY; // set in Netlify env vars
+  const API_KEY = process.env.COLLEGE_SCORECARD_KEY;
   const BASE_URL = "https://api.data.gov/ed/collegescorecard/v1/schools";
 
-  // Parse query params from frontend
   const params = new URLSearchParams({
     "fields": "id,school.name,school.city,school.state,latest.cost.tuition.in_state,"
             + "latest.cost.tuition.out_of_state,latest.admissions.admission_rate,"
@@ -14,7 +13,6 @@ exports.handler = async (event) => {
   });
 
   const query = event.queryStringParameters;
-
   if (query.state) params.append("school.state", query.state);
   if (query.max_tuition) params.append("latest.cost.tuition.in_state__lt", query.max_tuition);
   if (query.name) params.append("school.name", query.name);
