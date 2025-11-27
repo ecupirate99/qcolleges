@@ -16,7 +16,7 @@ document.getElementById("filterForm").addEventListener("submit", async (e) => {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "";
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     resultsDiv.innerHTML = "<p>No colleges found.</p>";
     return;
   }
