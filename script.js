@@ -28,7 +28,7 @@ function parseQuestion(text) {
 
 async function fetchResults(filters) {
   const query = new URLSearchParams(filters);
-  console.log("Query:", query.toString()); // Debug
+  console.log("Query:", query.toString());
 
   const loadingDiv = document.getElementById("loading");
   const resultsDiv = document.getElementById("results");
@@ -39,7 +39,7 @@ async function fetchResults(filters) {
   try {
     const res = await fetch(`/.netlify/functions/colleges?${query}`);
     const data = await res.json();
-    console.log("Results:", data); // Debug
+    console.log("Results:", data);
     renderResults(data);
   } catch (err) {
     resultsDiv.innerHTML = "<p>Error fetching results.</p>";
@@ -71,4 +71,83 @@ function renderResults(data) {
           ? (college["latest.completion.rate_suppressed.overall"] * 100).toFixed(1) + "%"
           : "N/A"
       }</p>
-      <button class="expand-btn" type="button">More Details ▼
+      <button class="expand-btn" type="button">More Details ▼</button>
+      <div class="details" style="display:none;">
+        <p>Acceptance Rate: ${
+          college["latest.admissions.admission_rate"] != null
+            ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%"
+            : "N/A"
+        }</p>
+        <p>Student Size: ${college["latest.student.size"] ?? "N/A"}</p>
+        <p>Average Debt: ${
+          college["latest.aid.median_debt.completers"] != null
+            ? "$" + college["latest.aid.median_debt.completers"]
+            : "N/A"
+        }</p>
+        <p>Pell Grant %: ${
+          college["latest.aid.pell_grant_rate"] != null
+            ? (college["latest.aid.pell_grant_rate"] * 100).toFixed(1) + "%"
+            : "N/A"
+        }</p>
+        <p>Median Earnings (10 yrs): ${
+          college["latest.earnings.10_yrs_after_entry.median"] != null
+            ? "$" + college["latest.earnings.10_yrs_after_entry.median"]
+            : "N/A"
+        }</p>
+        <p><a href="${college["school.school_url"]}" target="_blank">Visit Website</a></p>
+      </div>
+    `;
+
+    const expandBtn = card.querySelector(".expand-btn");
+    const detailsDiv = card.querySelector(".details");
+    expandBtn.addEventListener("click", () => {
+      const hidden = detailsDiv.style.display === "" || detailsDiv.style.display === "none";
+      detailsDiv.style.display = hidden ? "block" : "none";
+    });
+
+    resultsDiv.appendChild(card);
+  });
+}
+
+// Handle segmented control clicks
+const segButtons = document.querySelectorAll(".segmented-control button");
+let currentTuitionFilter = "in_state"; // default
+
+segButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    segButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTuitionFilter = btn.dataset.filter;
+  });
+});
+
+// Free-text form submit
+document.getElementById("questionForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const question = document.getElementById("question").value;
+
+  const filters = parseQuestion(question);
+  filters.tuition_filter = currentTuitionFilter;
+
+  if (filters.state) filters.state = filters.state.toUpperCase();
+
+  fetchResults(filters);
+});
+
+// Structured filters submit
+document.getElementById("filterForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const filters = {};
+  const state = document.getElementById("state").value.trim();
+  const maxTuition = document.getElementById("max_tuition").value.trim();
+  const name = document.getElementById("name").value.trim();
+
+  if (state) filters.state = state.toUpperCase();
+  if (maxTuition) filters.max_tuition = maxTuition;
+  if (name) filters.name = name;
+
+  filters.tuition_filter = currentTuitionFilter;
+
+  fetchResults(filters);
+});
