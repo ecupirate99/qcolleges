@@ -33,10 +33,9 @@ exports.handler = async (event) => {
   const json = await response.json();
   let results = Array.isArray(json.results) ? json.results : [];
 
-  // Tuition filter logic
   if (query.max_tuition) {
     const max = parseInt(query.max_tuition, 10);
-    const mode = query.tuition_filter || "both";
+    const mode = query.tuition_filter || "in_state";
 
     results = results.filter(college => {
       const inState = college["latest.cost.tuition.in_state"];
@@ -46,16 +45,12 @@ exports.handler = async (event) => {
         return inState != null && inState <= max;
       } else if (mode === "out_state") {
         return outState != null && outState <= max;
-      } else { // both
-        return (
-          inState != null && outState != null &&
-          inState <= max && outState <= max
-        );
+      } else {
+        return inState != null && outState != null && inState <= max && outState <= max;
       }
     });
   }
 
-  // Graduation rate filter
   if (query.grad_rate_min) {
     const min = parseFloat(query.grad_rate_min);
     results = results.filter(college => {
