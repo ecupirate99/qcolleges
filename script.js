@@ -68,7 +68,8 @@ async function fetchResults(filters) {
   if (filters.state) filters.state = filters.state.toUpperCase();
 
   const query = new URLSearchParams(filters);
-  console.log("Query:", query.toString());
+  console.log("Filters object:", filters);
+  console.log("Query string:", query.toString());
 
   loadingDiv.style.display = "block";
   resultsDiv.innerHTML = "";
@@ -204,4 +205,3 @@ document.getElementById("filterForm").addEventListener("submit", (e) => {
 });
 
 // Clear advanced filters
-document.getElementById("clearFiltersBtn").addEventListener("click
