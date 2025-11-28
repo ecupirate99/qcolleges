@@ -23,10 +23,9 @@
       >
 
       <!-- Tuition filter radio buttons -->
-      <div class="radio-group">
-        <label><input type="radio" name="q_tuition_filter" value="in_state" checked> In-state only</label>
-        <label><input type="radio" name="q_tuition_filter" value="out_state"> Out-of-state only</label>
-        <label><input type="radio" name="q_tuition_filter" value="both"> Both</label>
+      <div class="segmented-control">
+        <button type="button" data-filter="in_state" class="active">In-state</button>
+        <button type="button" data-filter="out_state">Out-of-state</button>
       </div>
 
       <div class="actions">
@@ -48,10 +47,9 @@
         <label class="label" for="name">College Name (optional)</label>
         <input type="text" id="name" name="name" class="input" placeholder="e.g. UNC" aria-label="College name">
 
-        <div class="radio-group">
-          <label><input type="radio" name="f_tuition_filter" value="in_state" checked> In-state only</label>
-          <label><input type="radio" name="f_tuition_filter" value="out_state"> Out-of-state only</label>
-          <label><input type="radio" name="f_tuition_filter" value="both"> Both</label>
+        <div class="segmented-control">
+          <button type="button" data-filter="in_state" class="active">In-state</button>
+          <button type="button" data-filter="out_state">Out-of-state</button>
         </div>
 
         <div class="actions">
