@@ -11,43 +11,61 @@
     <h1>College Finder</h1>
 
     <!-- Free-text search -->
-    <form id="questionForm">
-      <label for="question">Ask a question:</label>
-      <input type="text" id="question" name="question" placeholder="e.g. find colleges in nc under $20000">
+    <form id="questionForm" class="panel">
+      <label for="question" class="label">Ask a question</label>
+      <input
+        type="text"
+        id="question"
+        name="question"
+        class="input-lg"
+        placeholder="e.g. find colleges in nc under $30000 with graduation above 70%"
+        aria-label="Ask a question"
+      >
+
+      <!-- Tuition filter radio buttons -->
       <div class="radio-group">
-        <label><input type="radio" name="q_tuition_filter" value="in_state" checked> In-state</label>
-        <label><input type="radio" name="q_tuition_filter" value="out_state"> Out-of-state</label>
+        <label><input type="radio" name="q_tuition_filter" value="in_state" checked> In-state only</label>
+        <label><input type="radio" name="q_tuition_filter" value="out_state"> Out-of-state only</label>
         <label><input type="radio" name="q_tuition_filter" value="both"> Both</label>
       </div>
-      <button type="submit">Ask</button>
-      <button type="button" id="clearBtn" class="clear-btn">Clear</button>
-    </form>
 
-    <hr>
-
-    <!-- Structured filters -->
-    <form id="filterForm">
-      <label for="state">State:</label>
-      <input type="text" id="state" name="state" placeholder="e.g. NC">
-
-      <label for="max_tuition">Max tuition:</label>
-      <input type="number" id="max_tuition" name="max_tuition" placeholder="20000">
-
-      <label for="name">College name (optional):</label>
-      <input type="text" id="name" name="name" placeholder="UNC">
-
-      <div class="radio-group">
-        <label><input type="radio" name="f_tuition_filter" value="in_state" checked> In-state</label>
-        <label><input type="radio" name="f_tuition_filter" value="out_state"> Out-of-state</label>
-        <label><input type="radio" name="f_tuition_filter" value="both"> Both</label>
+      <div class="actions">
+        <button type="submit" class="btn-primary">Ask</button>
+        <button type="button" id="clearBtn" class="btn-secondary">Clear</button>
       </div>
-
-      <button type="submit">Search</button>
-      <button type="button" id="clearFiltersBtn" class="clear-btn">Clear</button>
-      <p id="errorMsg" class="error-msg"></p>
     </form>
 
-    <div id="loading" class="spinner" style="display:none;"></div>
+    <!-- Advanced filters -->
+    <details class="panel">
+      <summary class="panel-title">Advanced filters</summary>
+      <form id="filterForm" class="form-vertical">
+        <label class="label" for="state">State</label>
+        <input type="text" id="state" name="state" class="input" placeholder="e.g. NC" aria-label="State">
+
+        <label class="label" for="max_tuition">Max Tuition</label>
+        <input type="number" id="max_tuition" name="max_tuition" class="input" placeholder="e.g. 30000" aria-label="Max tuition">
+
+        <label class="label" for="name">College Name (optional)</label>
+        <input type="text" id="name" name="name" class="input" placeholder="e.g. UNC" aria-label="College name">
+
+        <div class="radio-group">
+          <label><input type="radio" name="f_tuition_filter" value="in_state" checked> In-state only</label>
+          <label><input type="radio" name="f_tuition_filter" value="out_state"> Out-of-state only</label>
+          <label><input type="radio" name="f_tuition_filter" value="both"> Both</label>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Search</button>
+          <button type="button" id="clearFiltersBtn" class="btn-secondary">Clear</button>
+        </div>
+        <p id="errorMsg" class="error-msg" role="alert"></p>
+      </form>
+    </details>
+
+    <!-- Spinner -->
+    <div id="loading" class="spinner" style="display:none;" aria-hidden="true"></div>
+
+    <!-- Results -->
     <div id="results"></div>
   </div>
   <script src="script.js"></script>
