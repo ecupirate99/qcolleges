@@ -1,21 +1,3 @@
-// Track tuition filter state
-let currentTuitionFilter = "in_state"; // default
-
-// Handle segmented control clicks
-function setupSegmentedControls() {
-  const segGroups = document.querySelectorAll(".segmented-control");
-  segGroups.forEach(group => {
-    const buttons = group.querySelectorAll("button");
-    buttons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        buttons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentTuitionFilter = btn.dataset.filter;
-      });
-    });
-  });
-}
-
 // --- Utilities ---
 const US_STATES = new Set([
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN",
@@ -35,10 +17,14 @@ function parseQuestion(text) {
   const filters = {};
   const normalized = text.trim();
 
-  // State
+  // Prefer explicit "in XX" or "state XX"
   let state = null;
   const explicitMatch = normalized.match(/\b(?:in|state)\s+([A-Za-z]{2})\b/i);
-  if (explicitMatch) state = normalizeStateCandidate(explicitMatch[1]);
+  if (explicitMatch) {
+    state = normalizeStateCandidate(explicitMatch[1]);
+  }
+
+  // If not found, scan all two-letter tokens
   if (!state) {
     const tokens = normalized.match(/\b([A-Za-z]{2})\b/g) || [];
     for (const tok of tokens) {
@@ -48,7 +34,7 @@ function parseQuestion(text) {
   }
   if (state) filters.state = state;
 
-  // Tuition
+  // Tuition: "$20,000", "20k", "under 20000"
   const tuitionMatch = normalized.match(/\b(?:under\s*)?\$?\s*([\d,]+(?:\.\d+)?|\d+\s*k)\b/i);
   if (tuitionMatch) {
     let val = tuitionMatch[1].toLowerCase().replace(/[, ]/g, "");
@@ -60,6 +46,17 @@ function parseQuestion(text) {
     }
   }
 
+  // Graduation rate: "above 70%"
+  const gradMatch = normalized.match(/(above|over|>=?)\s*(\d{1,3})\s*%/i);
+  if (gradMatch) {
+    const pct = parseInt(gradMatch[2], 10);
+    if (!Number.isNaN(pct)) filters.grad_rate_min = (pct / 100).toFixed(2);
+  }
+
+  // Name after keywords
+  const nameMatch = normalized.match(/(?:college|university)\s+([A-Za-z][A-Za-z&\-\s]+)/i);
+  if (nameMatch) filters.name = nameMatch[1].trim();
+
   return filters;
 }
 
@@ -69,10 +66,10 @@ async function fetchResults(filters) {
   const resultsDiv = document.getElementById("results");
 
   if (filters.state) filters.state = filters.state.toUpperCase();
-  filters.tuition_filter = currentTuitionFilter;
 
   const query = new URLSearchParams(filters);
-  console.log("Query:", query.toString());
+  console.log("Filters object:", filters);
+  console.log("Query string:", query.toString());
 
   loadingDiv.style.display = "block";
   resultsDiv.innerHTML = "";
@@ -112,7 +109,45 @@ function renderResults(data) {
           ? (college["latest.completion.rate_suppressed.overall"] * 100).toFixed(1) + "%"
           : "N/A"
       }</p>
+      <button class="expand-btn" type="button">More Details ▼</button>
+      <div class="details">
+        <p><strong>Acceptance Rate:</strong> ${
+          college["latest.admissions.admission_rate"] != null
+            ? (college["latest.admissions.admission_rate"] * 100).toFixed(1) + "%"
+            : "N/A"
+        }</p>
+        <p><strong>Student Size:</strong> ${college["latest.student.size"] ?? "N/A"}</p>
+        <p><strong>Median Debt (Completers):</strong> ${
+          college["latest.aid.median_debt.completers"] != null
+            ? "$" + Number(college["latest.aid.median_debt.completers"]).toLocaleString()
+            : "N/A"
+        }</p>
+        <p><strong>Pell Grant %:</strong> ${
+          college["latest.aid.pell_grant_rate"] != null
+            ? (college["latest.aid.pell_grant_rate"] * 100).toFixed(1) + "%"
+            : "N/A"
+        }</p>
+        <p><strong>Median Earnings (10 yrs):</strong> ${
+          college["latest.earnings.10_yrs_after_entry.median"] != null
+            ? "$" + Number(college["latest.earnings.10_yrs_after_entry.median"]).toLocaleString()
+            : "N/A"
+        }</p>
+        <p><strong>Website:</strong> ${
+          college["school.school_url"]
+            ? `<a href="${college["school.school_url"]}" target="_blank" rel="noopener">Visit website</a>`
+            : "N/A"
+        }</p>
+      </div>
     `;
+
+    const expandBtn = card.querySelector(".expand-btn");
+    const detailsDiv = card.querySelector(".details");
+    expandBtn.addEventListener("click", () => {
+      const hidden = detailsDiv.style.display === "" || detailsDiv.style.display === "none";
+      detailsDiv.style.display = hidden ? "block" : "none";
+      expandBtn.textContent = hidden ? "Hide Details ▲" : "More Details ▼";
+    });
+
     resultsDiv.appendChild(card);
   });
 }
@@ -122,10 +157,51 @@ document.getElementById("questionForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const question = document.getElementById("question").value;
   const filters = parseQuestion(question);
+
+  const qSelected = document.querySelector('input[name="q_tuition_filter"]:checked');
+  if (qSelected) filters.tuition_filter = qSelected.value;
+
   fetchResults(filters);
 });
 
 // Clear free-text form
 document.getElementById("clearBtn").addEventListener("click", () => {
   document.getElementById("question").value = "";
-  document.getElementBy
+  document.getElementById("results").innerHTML = "";
+});
+
+// --- Advanced filters submit ---
+document.getElementById("filterForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const filters = {};
+  const state = document.getElementById("state").value.trim();
+  const maxTuition = document.getElementById("max_tuition").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
+  errorMsg.textContent = "";
+
+  if (state) {
+    const normalizedState = normalizeStateCandidate(state);
+    if (!normalizedState) {
+      errorMsg.textContent = "Please enter a valid US state abbreviation (e.g., NC).";
+      return;
+    }
+    filters.state = normalizedState;
+
+    if (!maxTuition) {
+      errorMsg.textContent = "Max Tuition is required when State is specified.";
+      return;
+    }
+  }
+
+  if (maxTuition) filters.max_tuition = maxTuition;
+  if (name) filters.name = name;
+
+  const fSelected = document.querySelector('input[name="f_tuition_filter"]:checked');
+  if (fSelected) filters.tuition_filter = fSelected.value;
+
+  fetchResults(filters);
+});
+
+// Clear advanced filters
