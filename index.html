@@ -7,70 +7,49 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
+  <div class="container">
     <h1>College Finder</h1>
-  </header>
 
-  <main class="container">
-    <!-- Unified, mobile-first search panel -->
-    <section class="search-panel">
-      <form id="questionForm" class="search-form">
-        <input
-          type="text"
-          id="question"
-          class="search-bar"
-          placeholder="Search colleges (e.g., nc under $30000 with graduation above 70%)"
-          aria-label="Search colleges"
-        />
+    <!-- Free-text search -->
+    <form id="questionForm">
+      <label for="question">Ask a question:</label>
+      <input type="text" id="question" name="question" placeholder="e.g. find colleges in nc under $20000">
+      <div class="radio-group">
+        <label><input type="radio" name="q_tuition_filter" value="in_state" checked> In-state</label>
+        <label><input type="radio" name="q_tuition_filter" value="out_state"> Out-of-state</label>
+        <label><input type="radio" name="q_tuition_filter" value="both"> Both</label>
+      </div>
+      <button type="submit">Ask</button>
+      <button type="button" id="clearBtn" class="clear-btn">Clear</button>
+    </form>
 
-        <!-- Segmented control for tuition filter -->
-        <div class="segmented-control" role="tablist" aria-label="Tuition filter">
-          <button type="button" data-filter="in_state" class="active" aria-selected="true">In-state</button>
-          <button type="button" data-filter="out_state" aria-selected="false">Out-of-state</button>
-          <button type="button" data-filter="both" aria-selected="false">Both</button>
-        </div>
+    <hr>
 
-        <div class="form-actions">
-          <button type="submit" class="primary-btn">Ask</button>
-          <button type="button" id="clearBtn" class="secondary-btn">Clear</button>
-        </div>
-      </form>
+    <!-- Structured filters -->
+    <form id="filterForm">
+      <label for="state">State:</label>
+      <input type="text" id="state" name="state" placeholder="e.g. NC">
 
-      <!-- Collapsible advanced filters -->
-      <details class="filters">
-        <summary>Advanced filters</summary>
-        <form id="filterForm" class="filters-form">
-          <label class="field">
-            <span class="field-label">State</span>
-            <input type="text" id="state" placeholder="e.g. NC" aria-label="State"/>
-          </label>
-          <label class="field">
-            <span class="field-label">Max tuition</span>
-            <input type="number" id="max_tuition" placeholder="e.g. 30000" aria-label="Max tuition"/>
-          </label>
-          <label class="field">
-            <span class="field-label">College name</span>
-            <input type="text" id="name" placeholder="e.g. UNC" aria-label="College name"/>
-          </label>
-          <div class="form-actions">
-            <button type="submit" class="primary-btn">Search</button>
-            <button type="button" id="clearFiltersBtn" class="secondary-btn">Clear</button>
-          </div>
-          <p id="errorMsg" class="error-msg"></p>
-        </form>
-      </details>
-    </section>
+      <label for="max_tuition">Max tuition:</label>
+      <input type="number" id="max_tuition" name="max_tuition" placeholder="20000">
 
-    <!-- Active filter summary -->
-    <section id="activeSummary" class="active-summary" aria-live="polite"></section>
+      <label for="name">College name (optional):</label>
+      <input type="text" id="name" name="name" placeholder="UNC">
 
-    <!-- Spinner -->
-    <div id="loading" class="spinner" style="display:none;" aria-hidden="true"></div>
+      <div class="radio-group">
+        <label><input type="radio" name="f_tuition_filter" value="in_state" checked> In-state</label>
+        <label><input type="radio" name="f_tuition_filter" value="out_state"> Out-of-state</label>
+        <label><input type="radio" name="f_tuition_filter" value="both"> Both</label>
+      </div>
 
-    <!-- Results -->
-    <section id="results" class="results" aria-live="polite"></section>
-  </main>
+      <button type="submit">Search</button>
+      <button type="button" id="clearFiltersBtn" class="clear-btn">Clear</button>
+      <p id="errorMsg" class="error-msg"></p>
+    </form>
 
+    <div id="loading" class="spinner" style="display:none;"></div>
+    <div id="results"></div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
