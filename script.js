@@ -1,11 +1,38 @@
-// Parse free-text into filters
+// --- Utilities ---
+const US_STATES = new Set([
+  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN",
+  "IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV",
+  "NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN",
+  "TX","UT","VT","VA","WA","WV","WI","WY","DC","PR"
+]);
+
+function normalizeStateCandidate(s) {
+  if (!s) return null;
+  const cand = s.trim().toUpperCase();
+  return US_STATES.has(cand) ? cand : null;
+}
+
+// --- Parsing free-text into filters ---
 function parseQuestion(text) {
   const filters = {};
   const normalized = text.trim();
 
-  // State abbreviation, case-insensitive (nc or NC)
-  const stateMatch = normalized.match(/\b([A-Za-z]{2})\b/);
-  if (stateMatch) filters.state = stateMatch[1].toUpperCase();
+  // Prefer explicit "in XX" or "state XX"
+  let state = null;
+  const explicitMatch = normalized.match(/\b(?:in|state)\s+([A-Za-z]{2})\b/i);
+  if (explicitMatch) {
+    state = normalizeStateCandidate(explicitMatch[1]);
+  }
+
+  // If not found, scan all two-letter tokens
+  if (!state) {
+    const tokens = normalized.match(/\b([A-Za-z]{2})\b/g) || [];
+    for (const tok of tokens) {
+      const cand = normalizeStateCandidate(tok);
+      if (cand) { state = cand; break; }
+    }
+  }
+  if (state) filters.state = state;
 
   // Tuition: "$20,000", "20k", "under 20000"
   const tuitionMatch = normalized.match(/\b(?:under\s*)?\$?\s*([\d,]+(?:\.\d+)?|\d+\s*k)\b/i);
@@ -19,30 +46,29 @@ function parseQuestion(text) {
     }
   }
 
-  // Graduation rate (optional): "above 70%"
+  // Graduation rate: "above 70%"
   const gradMatch = normalized.match(/(above|over|>=?)\s*(\d{1,3})\s*%/i);
   if (gradMatch) {
     const pct = parseInt(gradMatch[2], 10);
     if (!Number.isNaN(pct)) filters.grad_rate_min = (pct / 100).toFixed(2);
   }
 
-  // Name after keywords (optional)
+  // Name after keywords
   const nameMatch = normalized.match(/(?:college|university)\s+([A-Za-z][A-Za-z&\-\s]+)/i);
   if (nameMatch) filters.name = nameMatch[1].trim();
 
   return filters;
 }
 
-// Fetch and render flow
+// --- Fetch and render flow ---
 async function fetchResults(filters) {
   const loadingDiv = document.getElementById("loading");
   const resultsDiv = document.getElementById("results");
 
-  // Normalize state
   if (filters.state) filters.state = filters.state.toUpperCase();
 
   const query = new URLSearchParams(filters);
-  console.log("Query:", query.toString()); // Debug to verify wiring
+  console.log("Query:", query.toString());
 
   loadingDiv.style.display = "block";
   resultsDiv.innerHTML = "";
@@ -50,7 +76,7 @@ async function fetchResults(filters) {
   try {
     const res = await fetch(`/.netlify/functions/colleges?${query}`);
     const data = await res.json();
-    console.log("Results:", data); // Debug to confirm
+    console.log("Results:", data);
     renderResults(data);
   } catch (err) {
     console.error(err);
@@ -125,14 +151,12 @@ function renderResults(data) {
   });
 }
 
-// Free-text form submit (wiring fix: ensure tuition_filter included)
+// --- Free-text form submit ---
 document.getElementById("questionForm").addEventListener("submit", (e) => {
   e.preventDefault();
-
   const question = document.getElementById("question").value;
   const filters = parseQuestion(question);
 
-  // Get selected tuition filter from free-text radio group
   const qSelected = document.querySelector('input[name="q_tuition_filter"]:checked');
   if (qSelected) filters.tuition_filter = qSelected.value;
 
@@ -145,7 +169,7 @@ document.getElementById("clearBtn").addEventListener("click", () => {
   document.getElementById("results").innerHTML = "";
 });
 
-// Advanced filters submit with validation and proper wiring
+// --- Advanced filters submit ---
 document.getElementById("filterForm").addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -156,9 +180,14 @@ document.getElementById("filterForm").addEventListener("submit", (e) => {
   const errorMsg = document.getElementById("errorMsg");
   errorMsg.textContent = "";
 
-  // If state is provided, max tuition is required
   if (state) {
-    filters.state = state.toUpperCase();
+    const normalizedState = normalizeStateCandidate(state);
+    if (!normalizedState) {
+      errorMsg.textContent = "Please enter a valid US state abbreviation (e.g., NC).";
+      return;
+    }
+    filters.state = normalizedState;
+
     if (!maxTuition) {
       errorMsg.textContent = "Max Tuition is required when State is specified.";
       return;
@@ -168,7 +197,6 @@ document.getElementById("filterForm").addEventListener("submit", (e) => {
   if (maxTuition) filters.max_tuition = maxTuition;
   if (name) filters.name = name;
 
-  // Get selected tuition filter from structured radio group
   const fSelected = document.querySelector('input[name="f_tuition_filter"]:checked');
   if (fSelected) filters.tuition_filter = fSelected.value;
 
@@ -176,10 +204,4 @@ document.getElementById("filterForm").addEventListener("submit", (e) => {
 });
 
 // Clear advanced filters
-document.getElementById("clearFiltersBtn").addEventListener("click", () => {
-  document.getElementById("state").value = "";
-  document.getElementById("max_tuition").value = "";
-  document.getElementById("name").value = "";
-  document.getElementById("errorMsg").textContent = "";
-  document.getElementById("results").innerHTML = "";
-});
+document.getElementById("clearFiltersBtn").addEventListener("click
