@@ -19,7 +19,7 @@
           type="text"
           id="question"
           class="search-bar"
-          placeholder="Search colleges (e.g., NC under $30000 with graduation above 70%)"
+          placeholder="Search colleges (e.g., nc under $30000 with graduation above 70%)"
           aria-label="Search colleges"
         />
 
@@ -30,7 +30,10 @@
           <button type="button" data-filter="both" aria-selected="false">Both</button>
         </div>
 
-        <button type="submit" class="primary-btn">Ask</button>
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">Ask</button>
+          <button type="button" id="clearBtn" class="secondary-btn">Clear</button>
+        </div>
       </form>
 
       <!-- Collapsible advanced filters -->
@@ -49,7 +52,11 @@
             <span class="field-label">College name</span>
             <input type="text" id="name" placeholder="e.g. UNC" aria-label="College name"/>
           </label>
-          <button type="submit" class="primary-btn">Search</button>
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Search</button>
+            <button type="button" id="clearFiltersBtn" class="secondary-btn">Clear</button>
+          </div>
+          <p id="errorMsg" class="error-msg"></p>
         </form>
       </details>
     </section>
