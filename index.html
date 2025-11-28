@@ -3,46 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <title>College Finder Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <header class="app-header">
     <h1>College Finder</h1>
+  </header>
 
-    <!-- Unified Search Panel -->
-    <div class="search-panel">
-      <!-- Free-text search -->
-      <form id="questionForm">
-        <input type="text" id="question" class="search-bar" placeholder="Search colleges...">
+  <main class="container">
+    <!-- Unified, mobile-first search panel -->
+    <section class="search-panel">
+      <form id="questionForm" class="search-form">
+        <input
+          type="text"
+          id="question"
+          class="search-bar"
+          placeholder="Search colleges (e.g., NC under $30000 with graduation above 70%)"
+          aria-label="Search colleges"
+        />
 
         <!-- Segmented control for tuition filter -->
-        <div class="segmented-control">
-          <button type="button" data-filter="in_state" class="active">In-state</button>
-          <button type="button" data-filter="out_state">Out-of-state</button>
-          <button type="button" data-filter="both">Both</button>
+        <div class="segmented-control" role="tablist" aria-label="Tuition filter">
+          <button type="button" data-filter="in_state" class="active" aria-selected="true">In-state</button>
+          <button type="button" data-filter="out_state" aria-selected="false">Out-of-state</button>
+          <button type="button" data-filter="both" aria-selected="false">Both</button>
         </div>
 
         <button type="submit" class="primary-btn">Ask</button>
       </form>
 
-      <!-- Collapsible structured filters -->
+      <!-- Collapsible advanced filters -->
       <details class="filters">
-        <summary>Advanced Filters</summary>
-        <form id="filterForm">
-          <input type="text" id="state" placeholder="State (e.g. NC)">
-          <input type="number" id="max_tuition" placeholder="Max Tuition">
-          <input type="text" id="name" placeholder="College Name">
+        <summary>Advanced filters</summary>
+        <form id="filterForm" class="filters-form">
+          <label class="field">
+            <span class="field-label">State</span>
+            <input type="text" id="state" placeholder="e.g. NC" aria-label="State"/>
+          </label>
+          <label class="field">
+            <span class="field-label">Max tuition</span>
+            <input type="number" id="max_tuition" placeholder="e.g. 30000" aria-label="Max tuition"/>
+          </label>
+          <label class="field">
+            <span class="field-label">College name</span>
+            <input type="text" id="name" placeholder="e.g. UNC" aria-label="College name"/>
+          </label>
           <button type="submit" class="primary-btn">Search</button>
         </form>
       </details>
-    </div>
+    </section>
+
+    <!-- Active filter summary -->
+    <section id="activeSummary" class="active-summary" aria-live="polite"></section>
 
     <!-- Spinner -->
-    <div id="loading" class="spinner" style="display:none;"></div>
+    <div id="loading" class="spinner" style="display:none;" aria-hidden="true"></div>
 
     <!-- Results -->
-    <div id="results"></div>
-  </div>
+    <section id="results" class="results" aria-live="polite"></section>
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>
